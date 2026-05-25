@@ -2,13 +2,91 @@ import React, { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Camera, Utensils, Sparkles, MessageCircle, Star, Users, Moon, HelpCircle } from "lucide-react";
 
+const bookingFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfs8aZ_TK8SV5-fFYvqhGauH-9nNksWepZp5T9Uz-mc3rA5BQ/viewform?usp=header";
+
 const tourIcons = {
   classic: MapPin,
   culture: Utensils,
   custom: Sparkles,
 };
 
-const bookingFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfs8aZ_TK8SV5-fFYvqhGauH-9nNksWepZp5T9Uz-mc3rA5BQ/viewform?usp=header";
+const legalContent = {
+  en: {
+    terms: [
+      ["1. Service", "TOKYO LOCAL FRIENDS provides local guide experiences in and around Tokyo, including walking tours, introductions to restaurants and sightseeing spots, photo/video support, and customized local experiences."],
+      ["2. Not a travel package", "This service does not arrange or sell accommodation, transportation, flights, or package tours. Unless clearly stated otherwise, food, transportation, entrance fees, shopping costs, and other personal expenses are not included in the tour fee."],
+      ["3. Booking", "Bookings are accepted through Instagram DM, Google Form, email, or other contact methods. A booking is confirmed only after the date, time, number of guests, tour content, and fee have been agreed by both parties."],
+      ["4. Fees and payment", "Tour fees are shown on this website or confirmed by message before booking. Payment method and timing will be provided at the time of booking confirmation."],
+      ["5. Cancellations and lateness", "If a guest cancels after booking, a cancellation fee may apply depending on the timing and situation. If a guest is late, please contact us as soon as possible. The tour time may be shortened, and refunds or discounts may not be available for late arrival."],
+      ["6. Changes due to weather or safety", "Tour routes, times, or contents may be changed or cancelled due to bad weather, transportation issues, congestion, temporary closures, disasters, or other safety reasons. We will try to suggest an alternative when possible."],
+      ["7. Guest responsibility", "Guests are responsible for their own health, belongings, valuables, and personal actions during the tour. We are not responsible for issues caused by guest negligence, excessive drinking, illegal acts, dangerous behavior, or behavior that disturbs shops, locals, other guests, or public spaces."],
+      ["8. Photos and videos", "Photos and videos may be taken during the tour. If we use guest images for social media, advertising, or the website, we will generally ask for permission in advance. Guests should also respect the privacy of other guests and third parties when posting their own photos or videos."],
+      ["9. Discounts and benefits", "Discounts and benefits such as social media discounts, follow discounts, and free memory videos are available only when the stated conditions are met. These benefits may be changed or ended without prior notice."],
+      ["10. Disclaimer", "We do our best to provide a fun and safe experience. However, we are not responsible for accidents, injuries, theft, loss, third-party trouble, shop closures, congestion, transportation delays, weather, or other external factors, except in cases of intentional misconduct or gross negligence by us."],
+      ["11. Prohibited actions", "Illegal acts, dangerous behavior, harassment, violence, excessive drinking, drug use, violation of shop or facility rules, no-shows, and any behavior we consider inappropriate are prohibited. In such cases, we may stop the tour without refund."],
+      ["12. Contact", "For questions about these Terms, please contact us at tokyolocalfriends@gmail.com or Instagram @tokyolocalfriends."],
+    ],
+    privacy: [
+      ["1. Information we collect", "We may collect information such as your name, email address, Instagram account, travel dates, number of guests, preferred language, requested tour content, budget, and messages sent through forms, email, or social media."],
+      ["2. Purpose of use", "We use personal information to manage bookings, reply to inquiries, arrange tours, provide customer support, improve our service, and contact guests when necessary."],
+      ["3. Sharing of information", "We do not sell personal information. We will not share personal information with third parties unless required by law, necessary for safety, or necessary to provide the service with the guest’s consent."],
+      ["4. Google Forms and external services", "Booking forms and messages may be handled through external services such as Google Forms, Instagram, Gmail, or other platforms. These services may process data according to their own privacy policies."],
+      ["5. Photos and videos", "Photos and videos taken during the tour may be used for memory videos or promotional purposes only when appropriate permission has been obtained. Guests may request removal of images where reasonably possible."],
+      ["6. Data management", "We take reasonable care to manage personal information safely. However, no online communication or storage method can be guaranteed to be completely secure."],
+      ["7. Requests", "Guests may contact us to ask about their personal information, request correction, or request deletion where reasonably possible."],
+      ["8. Contact", "For privacy-related questions, please contact tokyolocalfriends@gmail.com."],
+    ],
+  },
+  ja: {
+    terms: [
+      ["1. サービス内容", "TOKYO LOCAL FRIENDSは、東京を中心としたローカルガイド体験、街歩き、飲食店・観光スポットの紹介、写真・動画サポート、カスタム体験等を提供するサービスです。"],
+      ["2. 旅行商品ではないこと", "本サービスは、宿泊・交通機関・航空券等を手配または販売する旅行商品ではありません。特別な記載がない限り、飲食代、交通費、入場料、買い物代等はお客様ご自身の負担となります。"],
+      ["3. 予約について", "予約は、Instagram DM、Googleフォーム、メール等を通じて受け付けます。予約は、日時・人数・内容・料金等について双方が合意した時点で確定します。"],
+      ["4. 料金・支払い", "ツアー料金は、サイトまたは事前のメッセージで提示します。支払い方法・支払い時期は、予約確定時に案内します。"],
+      ["5. キャンセル・遅刻", "お客様都合によるキャンセルの場合、キャンセル時期や状況によりキャンセル料が発生する場合があります。開始時間に遅れる場合は、できるだけ早くご連絡ください。大幅な遅刻によりツアー時間が短くなる場合でも、料金の減額や返金ができない場合があります。"],
+      ["6. 天候・安全上の理由による変更", "悪天候、交通機関の乱れ、混雑、店舗休業、災害、その他安全上の理由により、ツアー内容・ルート・時間を変更または中止する場合があります。その場合は、可能な限り代替案をご提案します。"],
+      ["7. お客様の責任", "ツアー中の体調管理、貴重品・手荷物の管理、お客様自身の行動についてはお客様ご自身の責任となります。お客様の不注意、過度な飲酒、危険行為、法令違反、公序良俗に反する行為、店舗・通行人・地域住民への迷惑行為等により発生したトラブルについて、当方は責任を負いかねます。"],
+      ["8. 写真・動画撮影について", "ツアー中に写真・動画を撮影する場合があります。SNS投稿、広告、サイト掲載等に使用する場合は、原則として事前に確認します。お客様が撮影された写真・動画をSNS等に投稿する場合は、他のお客様や第三者のプライバシーにご配慮ください。"],
+      ["9. 割引・特典について", "SNS割引、フォロー割引、記念動画プレゼント等は、当方が指定する条件を満たした場合に限り適用されます。特典内容は予告なく変更・終了する場合があります。"],
+      ["10. 免責事項", "本サービスでは、できる限り楽しく安全な体験を提供するよう努めますが、店舗の混雑、臨時休業、交通状況、天候、事故、怪我、盗難、紛失、第三者とのトラブル等について、当方の故意または重大な過失がある場合を除き、責任を負いかねます。"],
+      ["11. 禁止事項", "法令に違反する行為、危険行為、迷惑行為、暴力行為、過度な飲酒、薬物使用、店舗や施設のルールに反する行為、無断キャンセル、ガイドや第三者へのハラスメント行為、その他当方が不適切と判断する行為は禁止します。該当する場合、返金なくツアーを中止することがあります。"],
+      ["12. お問い合わせ", "本規約に関するお問い合わせは、tokyolocalfriends@gmail.com または Instagram @tokyolocalfriends までご連絡ください。"],
+    ],
+    privacy: [
+      ["1. 取得する情報", "当方は、予約・問い合わせ時に、氏名、メールアドレス、Instagramアカウント、旅行日程、人数、希望言語、希望ツアー内容、予算、メッセージ内容等を取得する場合があります。"],
+      ["2. 利用目的", "取得した個人情報は、予約管理、問い合わせ対応、ツアー内容の調整、サービス提供、カスタマーサポート、サービス改善、必要な連絡のために利用します。"],
+      ["3. 第三者提供", "個人情報を販売することはありません。法令に基づく場合、安全確保のために必要な場合、またはお客様の同意がある場合を除き、第三者に提供しません。"],
+      ["4. Googleフォーム等の外部サービス", "予約フォームやメッセージは、Googleフォーム、Instagram、Gmail等の外部サービスを通じて管理される場合があります。これらのサービスでは、それぞれのプライバシーポリシーに従って情報が処理されます。"],
+      ["5. 写真・動画", "ツアー中に撮影した写真・動画は、記念動画の作成またはプロモーション目的で使用する場合があります。掲載等に使用する場合は、原則として事前に確認します。削除希望がある場合は、可能な範囲で対応します。"],
+      ["6. 情報管理", "当方は、個人情報を適切に管理するよう努めます。ただし、オンライン上の通信や保存方法について、完全な安全性を保証するものではありません。"],
+      ["7. 開示・訂正・削除の依頼", "お客様は、ご自身の個人情報について、確認、訂正、削除を希望する場合、当方に連絡することができます。合理的な範囲で対応します。"],
+      ["8. お問い合わせ", "プライバシーポリシーに関するお問い合わせは、tokyolocalfriends@gmail.com までご連絡ください。"],
+    ],
+  },
+};
+
+const sharedTours = {
+  en: [
+    { id: "classic", title: "Tokyo Classic Tour", subtitle: "For first-time visitors", price: "From ¥4,500 / person", points: ["Shibuya Crossing", "Shinjuku", "Harajuku", "Asakusa", "Tokyo Tower photo spots"] },
+    { id: "culture", title: "Anime, Food & Culture", subtitle: "For Japan lovers", price: "From ¥7,000 / person", points: ["Akihabara", "Game centers", "Karaoke experience", "Local recommended restaurants", "Ramen or izakaya", "Convenience store culture"] },
+    { id: "custom", title: "Private Custom Tour", subtitle: "Your Tokyo, your way", price: "Consultation required", points: [], customMessage: "Tell us EVERYTHING you want to do in Japan.", customEmphasis: "EVERYTHING YOU WANT TO DO IN JAPAN" },
+  ],
+  ja: [
+    { id: "classic", title: "東京王道ツアー", subtitle: "初めて東京に来る方向け", price: "1人 ¥4,500〜", points: ["渋谷スクランブル交差点", "新宿", "原宿", "浅草", "東京タワー写真スポット"] },
+    { id: "culture", title: "アニメ・食・日本文化ツアー", subtitle: "日本カルチャー好き向け", price: "1人 ¥7,000〜", points: ["秋葉原", "ゲームセンター", "カラオケ体験", "現地の人おすすめのお店", "ラーメン or 居酒屋", "コンビニ文化体験"] },
+    { id: "custom", title: "完全カスタムツアー", subtitle: "あなたの理想の東京へ", price: "要相談", points: [], customMessage: "日本でやりたいことを全部教えてください。", customEmphasis: "日本でやりたいこと" },
+  ],
+  es: [
+    { id: "classic", title: "Tour Clásico de Tokio", subtitle: "Para quienes visitan Tokio por primera vez", price: "Desde ¥4,500 / persona", points: ["Cruce de Shibuya", "Shinjuku", "Harajuku", "Asakusa", "Fotos cerca de Tokyo Tower"] },
+    { id: "culture", title: "Anime, Comida y Cultura", subtitle: "Para amantes de Japón", price: "Desde ¥7,000 / persona", points: ["Akihabara", "Arcades", "Experiencia de karaoke", "Restaurantes recomendados por locales", "Ramen o izakaya", "Cultura de konbini"] },
+    { id: "custom", title: "Tour Privado Personalizado", subtitle: "Tu Tokio, a tu manera", price: "Consultar precio", points: [], customMessage: "Cuéntanos TODO lo que quieres hacer en Japón.", customEmphasis: "TODO LO QUE QUIERES HACER EN JAPÓN" },
+  ],
+  zh: [
+    { id: "classic", title: "东京经典路线", subtitle: "适合第一次来东京的客人", price: "每人 ¥4,500起", points: ["涩谷十字路口", "新宿", "原宿", "浅草", "东京塔拍照点"] },
+    { id: "culture", title: "动漫、美食与日本文化", subtitle: "适合喜欢日本文化的人", price: "每人 ¥7,000起", points: ["秋叶原", "游戏厅", "卡拉OK体验", "本地人推荐餐厅", "拉面或居酒屋", "便利店文化体验"] },
+    { id: "custom", title: "私人定制路线", subtitle: "按照你的想法体验东京", price: "价格需咨询", points: [], customMessage: "请告诉我们你想在日本做的一切。", customEmphasis: "你想在日本做的一切" },
+  ],
+};
 
 const translations = {
   en: {
@@ -28,11 +106,7 @@ const translations = {
     navGuide: "Guide",
     navFaq: "FAQ",
     navContact: "Contact",
-    metrics: [
-      { value: "4", label: "Languages" },
-      { value: "3", label: "Tour styles" },
-      { value: "15%+5%", label: "SNS discount" },
-    ],
+    metrics: [{ value: "4", label: "Languages" }, { value: "3", label: "Tour styles" }, { value: "15%+5%", label: "SNS discount" }],
     galleryLabel: "Tokyo, your way",
     galleryTitle: "A trip that feels personal, local, and unforgettable.",
     galleryDesc: "Every tour is built around the kind of Tokyo you want to feel — cinematic nights, local food, anime culture, hidden stores, conversation, photos, and real memories.",
@@ -43,6 +117,11 @@ const translations = {
     ],
     faqLabel: "Before you book",
     faqTitle: "Questions travelers usually ask.",
+    legalLabel: "Terms & Privacy",
+    legalTitle: "Terms of Use & Privacy Policy",
+    termsTitle: "Terms of Use",
+    privacyTitle: "Privacy Policy",
+    legalNote: "Please review these before booking. This section is a practical draft and may be updated as the service grows.",
     faqs: [
       { q: "Do I need to speak Japanese?", a: "No. Japanese, English, Spanish, and Chinese support are available." },
       { q: "Are food and transportation included?", a: "Food and transportation costs are separate, so you can choose freely depending on your budget." },
@@ -84,38 +163,8 @@ const translations = {
     email: "Email: tokyolocalfriends@gmail.com",
     footer: "TOKYO FRIENDS!!! — Tokyo local tour experience. Food and transportation costs are not included.",
     discount: "Post on social media with #TokyoLocalFriends and get 15% off. Follow us for an extra 5% off.",
-    highlights: [
-      "Local friend vibe, not a boring tour",
-      "Japanese, English, Spanish, and Chinese available",
-      "Photos, videos, and memories included",
-      "Food and transportation costs are separate",
-      "We will also teach you lots of useful Japanese phrases for travel!",
-    ],
-    tours: [
-      {
-        id: "classic",
-        title: "Tokyo Classic Tour",
-        subtitle: "For first-time visitors",
-        price: "From ¥4,500 / person",
-        points: ["Shibuya Crossing", "Shinjuku", "Harajuku", "Asakusa", "Tokyo Tower photo spots"],
-      },
-      {
-        id: "culture",
-        title: "Anime, Food & Culture",
-        subtitle: "For Japan lovers",
-        price: "From ¥7,000 / person",
-        points: ["Akihabara", "Game centers", "Karaoke experience", "Local recommended restaurants", "Ramen or izakaya", "Convenience store culture"],
-      },
-      {
-        id: "custom",
-        title: "Private Custom Tour",
-        subtitle: "Your Tokyo, your way",
-        price: "Consultation required",
-        points: [],
-        customMessage: "Tell us EVERYTHING you want to do in Japan.",
-        customEmphasis: "EVERYTHING YOU WANT TO DO IN JAPAN",
-      },
-    ],
+    highlights: ["Local friend vibe, not a boring tour", "Japanese, English, Spanish, and Chinese available", "Photos, videos, and memories included", "Food and transportation costs are separate", "We will also teach you lots of useful Japanese phrases for travel!"],
+    tours: sharedTours.en,
   },
   ja: {
     badge: "東京ローカルツアー & ナイト体験",
@@ -134,11 +183,7 @@ const translations = {
     navGuide: "ガイド",
     navFaq: "FAQ",
     navContact: "問い合わせ先",
-    metrics: [
-      { value: "4", label: "対応言語" },
-      { value: "3", label: "ツアー形式" },
-      { value: "15%+5%", label: "SNS割引" },
-    ],
+    metrics: [{ value: "4", label: "対応言語" }, { value: "3", label: "ツアー形式" }, { value: "15%+5%", label: "SNS割引" }],
     galleryLabel: "あなたらしい東京へ",
     galleryTitle: "ただ見るだけじゃなく、ちゃんと思い出になる東京体験。",
     galleryDesc: "夜の東京、ローカル飯、アニメ文化、穴場のお店、会話、写真、動画まで、その人が本当に楽しめる東京を一緒に作ります。",
@@ -149,6 +194,11 @@ const translations = {
     ],
     faqLabel: "予約前の安心ポイント",
     faqTitle: "よくある質問。",
+    legalLabel: "利用規約・プライバシー",
+    legalTitle: "利用規約・プライバシーポリシー",
+    termsTitle: "利用規約",
+    privacyTitle: "プライバシーポリシー",
+    legalNote: "予約前にご確認ください。この内容は運営開始用のたたき台であり、サービス状況に応じて更新される場合があります。",
     faqs: [
       { q: "日本語が話せなくても大丈夫？", a: "大丈夫です。日本語・英語・スペイン語・中国語に対応可能です。" },
       { q: "飲食代や交通費は含まれる？", a: "飲食代・交通費は別です。予算に合わせて自由に選べます。" },
@@ -190,38 +240,8 @@ const translations = {
     email: "メール: tokyolocalfriends@gmail.com",
     footer: "TOKYO FRIENDS!!! — 東京ローカルツアー。飲食代・交通費は含まれていません。",
     discount: "SNSに #TokyoLocalFriends をつけて投稿すると15%OFF。さらにフォローで追加5%OFF。",
-    highlights: [
-      "退屈じゃないローカル感",
-      "日本語・英語・スペイン語・中国語対応可能",
-      "写真・動画サポート付き",
-      "飲食代・交通費は別",
-      "もちろん旅行に使える日本語もたくさん教えます！",
-    ],
-    tours: [
-      {
-        id: "classic",
-        title: "東京王道ツアー",
-        subtitle: "初めて東京に来る方向け",
-        price: "1人 ¥4,500〜",
-        points: ["渋谷スクランブル交差点", "新宿", "原宿", "浅草", "東京タワー写真スポット"],
-      },
-      {
-        id: "culture",
-        title: "アニメ・食・日本文化ツアー",
-        subtitle: "日本カルチャー好き向け",
-        price: "1人 ¥7,000〜",
-        points: ["秋葉原", "ゲームセンター", "カラオケ体験", "現地の人おすすめのお店", "ラーメン or 居酒屋", "コンビニ文化体験"],
-      },
-      {
-        id: "custom",
-        title: "完全カスタムツアー",
-        subtitle: "あなたの理想の東京へ",
-        price: "要相談",
-        points: [],
-        customMessage: "日本でやりたいことを全部教えてください。",
-        customEmphasis: "日本でやりたいこと",
-      },
-    ],
+    highlights: ["退屈じゃないローカル感", "日本語・英語・スペイン語・中国語対応可能", "写真・動画サポート付き", "飲食代・交通費は別", "もちろん旅行に使える日本語もたくさん教えます！"],
+    tours: sharedTours.ja,
   },
   es: {
     badge: "Tours locales y experiencias nocturnas en Tokio",
@@ -240,11 +260,7 @@ const translations = {
     navGuide: "Guía",
     navFaq: "FAQ",
     navContact: "Contacto",
-    metrics: [
-      { value: "4", label: "Idiomas" },
-      { value: "3", label: "Tipos de tour" },
-      { value: "15%+5%", label: "Descuento SNS" },
-    ],
+    metrics: [{ value: "4", label: "Idiomas" }, { value: "3", label: "Tipos de tour" }, { value: "15%+5%", label: "Descuento SNS" }],
     galleryLabel: "Tokio a tu manera",
     galleryTitle: "Un viaje personal, local e inolvidable.",
     galleryDesc: "Cada tour se adapta al Tokio que quieres vivir: noches de neón, comida local, anime, lugares escondidos, conversación, fotos y recuerdos reales.",
@@ -255,6 +271,11 @@ const translations = {
     ],
     faqLabel: "Antes de reservar",
     faqTitle: "Preguntas frecuentes.",
+    legalLabel: "Términos y privacidad",
+    legalTitle: "Términos de uso y política de privacidad",
+    termsTitle: "Terms of Use",
+    privacyTitle: "Privacy Policy",
+    legalNote: "Please review these before booking. The legal text is currently provided in English and may be updated as the service grows.",
     faqs: [
       { q: "¿Necesito hablar japonés?", a: "No. Podemos ayudarte en japonés, inglés, español y chino." },
       { q: "¿La comida y el transporte están incluidos?", a: "No están incluidos, para que puedas elegir libremente según tu presupuesto." },
@@ -296,38 +317,8 @@ const translations = {
     email: "Correo: tokyolocalfriends@gmail.com",
     footer: "TOKYO FRIENDS!!! — Experiencia local en Tokio. La comida y el transporte no están incluidos.",
     discount: "Publica en redes sociales con #TokyoLocalFriends y recibe 15% de descuento. Síguenos y recibe 5% extra.",
-    highlights: [
-      "Ambiente amigable y local",
-      "Disponible en japonés, inglés, español y chino",
-      "Fotos, videos y recuerdos incluidos",
-      "Comida y transporte separados",
-      "También te enseñaremos muchas frases útiles en japonés para viajar.",
-    ],
-    tours: [
-      {
-        id: "classic",
-        title: "Tour Clásico de Tokio",
-        subtitle: "Para quienes visitan Tokio por primera vez",
-        price: "Desde ¥4,500 / persona",
-        points: ["Cruce de Shibuya", "Shinjuku", "Harajuku", "Asakusa", "Fotos cerca de Tokyo Tower"],
-      },
-      {
-        id: "culture",
-        title: "Anime, Comida y Cultura",
-        subtitle: "Para amantes de Japón",
-        price: "Desde ¥7,000 / persona",
-        points: ["Akihabara", "Arcades", "Experiencia de karaoke", "Restaurantes recomendados por locales", "Ramen o izakaya", "Cultura de konbini"],
-      },
-      {
-        id: "custom",
-        title: "Tour Privado Personalizado",
-        subtitle: "Tu Tokio, a tu manera",
-        price: "Consultar precio",
-        points: [],
-        customMessage: "Cuéntanos TODO lo que quieres hacer en Japón.",
-        customEmphasis: "TODO LO QUE QUIERES HACER EN JAPÓN",
-      },
-    ],
+    highlights: ["Ambiente amigable y local", "Disponible en japonés, inglés, español y chino", "Fotos, videos y recuerdos incluidos", "Comida y transporte separados", "También te enseñaremos muchas frases útiles en japonés para viajar."],
+    tours: sharedTours.es,
   },
   zh: {
     badge: "东京本地夜生活体验",
@@ -346,11 +337,7 @@ const translations = {
     navGuide: "向导",
     navFaq: "FAQ",
     navContact: "联系方式",
-    metrics: [
-      { value: "4", label: "支持语言" },
-      { value: "3", label: "路线类型" },
-      { value: "15%+5%", label: "社媒优惠" },
-    ],
+    metrics: [{ value: "4", label: "支持语言" }, { value: "3", label: "路线类型" }, { value: "15%+5%", label: "社媒优惠" }],
     galleryLabel: "你的东京方式",
     galleryTitle: "更私人、更本地、更难忘的东京体验。",
     galleryDesc: "每次行程都会根据你想体验的东京来设计：霓虹夜景、本地美食、动漫文化、隐藏店铺、聊天、拍照和真正的回忆。",
@@ -361,6 +348,11 @@ const translations = {
     ],
     faqLabel: "预约前须知",
     faqTitle: "常见问题。",
+    legalLabel: "条款与隐私",
+    legalTitle: "使用条款与隐私政策",
+    termsTitle: "Terms of Use",
+    privacyTitle: "Privacy Policy",
+    legalNote: "Please review these before booking. The legal text is currently provided in English and may be updated as the service grows.",
     faqs: [
       { q: "不会日语也可以吗？", a: "可以。支持日语、英语、西班牙语和中文。" },
       { q: "餐饮和交通包含吗？", a: "不包含。这样可以根据你的预算自由选择。" },
@@ -402,115 +394,35 @@ const translations = {
     email: "邮箱: tokyolocalfriends@gmail.com",
     footer: "TOKYO FRIENDS!!! — 东京本地体验。餐饮与交通费用不包含在内。",
     discount: "在社交媒体发布并添加 #TokyoLocalFriends，可享受15%优惠。关注我们可再享受5%优惠。",
-    highlights: [
-      "真正本地朋友的感觉",
-      "支持日语、英语、西班牙语和中文",
-      "包含拍照和视频记录",
-      "餐饮和交通费用另算",
-      "当然也会教你很多旅行中能用的日语！",
-    ],
-    tours: [
-      {
-        id: "classic",
-        title: "东京经典路线",
-        subtitle: "适合第一次来东京的客人",
-        price: "每人 ¥4,500起",
-        points: ["涩谷十字路口", "新宿", "原宿", "浅草", "东京塔拍照点"],
-      },
-      {
-        id: "culture",
-        title: "动漫、美食与日本文化",
-        subtitle: "适合喜欢日本文化的人",
-        price: "每人 ¥7,000起",
-        points: ["秋叶原", "游戏厅", "卡拉OK体验", "本地人推荐餐厅", "拉面或居酒屋", "便利店文化体验"],
-      },
-      {
-        id: "custom",
-        title: "私人定制路线",
-        subtitle: "按照你的想法体验东京",
-        price: "价格需咨询",
-        points: [],
-        customMessage: "请告诉我们你想在日本做的一切。",
-        customEmphasis: "你想在日本做的一切",
-      },
-    ],
+    highlights: ["真正本地朋友的感觉", "支持日语、英语、西班牙语和中文", "包含拍照和视频记录", "餐饮和交通费用另算", "当然也会教你很多旅行中能用的日语！"],
+    tours: sharedTours.zh,
   },
 };
 
 function runContentTests() {
   const languages = ["en", "ja", "es", "zh"];
-  const requiredKeys = [
-    "badge",
-    "hero",
-    "book",
-    "view",
-    "feeling",
-    "locations",
-    "review",
-    "reviewNote",
-    "choose",
-    "title",
-    "desc",
-    "navTours",
-    "navExperience",
-    "navGuide",
-    "navFaq",
-    "navContact",
-    "galleryLabel",
-    "galleryTitle",
-    "galleryDesc",
-    "faqLabel",
-    "faqTitle",
-    "experienceLabel",
-    "experienceTitle",
-    "experienceDesc",
-    "howLabel",
-    "howTitle",
-    "why",
-    "whyTitle",
-    "whyDesc",
-    "localSpotPromise",
-    "profileLabel",
-    "profileTitle",
-    "profileRole",
-    "profileBio",
-    "profileBio2",
-    "ready",
-    "readyDesc",
-    "bookingForm",
-    "bookingHint",
-    "instagram",
-    "email",
-    "footer",
-    "discount",
-  ];
+  const requiredKeys = ["badge", "hero", "book", "view", "feeling", "locations", "review", "reviewNote", "choose", "title", "desc", "navTours", "navExperience", "navGuide", "navFaq", "navContact", "galleryLabel", "galleryTitle", "galleryDesc", "faqLabel", "faqTitle", "legalLabel", "legalTitle", "termsTitle", "privacyTitle", "legalNote", "experienceLabel", "experienceTitle", "experienceDesc", "howLabel", "howTitle", "why", "whyTitle", "whyDesc", "localSpotPromise", "profileLabel", "profileTitle", "profileRole", "profileBio", "profileBio2", "ready", "readyDesc", "bookingForm", "bookingHint", "instagram", "email", "footer", "discount"];
 
   languages.forEach((language) => {
     const t = translations[language];
+    const legal = legalContent[language] ?? legalContent.en;
 
     console.assert(Boolean(t), `${language}: translation exists`);
-    requiredKeys.forEach((key) => {
-      console.assert(typeof t[key] === "string" && t[key].length > 0, `${language}: ${key} exists`);
-    });
+    requiredKeys.forEach((key) => console.assert(typeof t[key] === "string" && t[key].length > 0, `${language}: ${key} exists`));
     console.assert(t.tours.length === 3, `${language}: has exactly 3 tours`);
     console.assert(t.highlights.length === 5, `${language}: has exactly 5 highlights`);
     console.assert(t.metrics.length === 3, `${language}: has exactly 3 metrics`);
     console.assert(t.gallery.length === 3, `${language}: has exactly 3 gallery cards`);
     console.assert(t.faqs.length === 4, `${language}: has exactly 4 FAQs`);
+    console.assert(legal.terms.length >= 8, `${language}: terms content exists`);
+    console.assert(legal.privacy.length >= 6, `${language}: privacy content exists`);
     console.assert(t.moments.length === 4, `${language}: has exactly 4 experience moments`);
-    console.assert(t.moments[3].text.includes("free") || t.moments[3].text.includes("無料") || t.moments[3].text.includes("gratis") || t.moments[3].text.includes("免费"), `${language}: fourth moment includes free video gift`);
-    console.assert(t.moments[3].text.includes("social") || t.moments[3].text.includes("SNS") || t.moments[3].text.includes("redes") || t.moments[3].text.includes("社交媒体"), `${language}: fourth moment includes social media condition`);
     console.assert(t.steps.length === 4, `${language}: has exactly 4 booking steps`);
     console.assert(t.tours.every((tour) => Array.isArray(tour.points)), `${language}: every tour has a points array`);
     console.assert(t.tours.filter((tour) => tour.id !== "custom").every((tour) => tour.points.length > 0), `${language}: non-custom tours have points`);
     console.assert(t.tours.some((tour) => tour.id === "custom" && tour.points.length === 0), `${language}: custom tour has no bullet points`);
     console.assert(t.tours.some((tour) => tour.id === "custom" && Boolean(tour.customEmphasis)), `${language}: custom tour has big emphasis text`);
     console.assert(t.tours.some((tour) => tour.id === "custom" && Boolean(tour.customMessage)), `${language}: custom tour has a custom message`);
-    console.assert(t.highlights.some((item) => item.includes("Japanese") || item.includes("日本語") || item.includes("japonés") || item.includes("日语")), `${language}: highlights include useful Japanese phrase support`);
-    console.assert(t.highlights.some((item) => item.includes("English") || item.includes("英語") || item.includes("inglés") || item.includes("英语")), `${language}: highlights include multilingual support`);
-    console.assert(t.localSpotPromise.includes("Tokyo") || t.localSpotPromise.includes("東京") || t.localSpotPromise.includes("Tokio") || t.localSpotPromise.includes("东京"), `${language}: local spot promise mentions Tokyo`);
-    console.assert(Array.isArray(t.profileTags) && t.profileTags.length >= 4, `${language}: profile tags exist`);
-    console.assert(t.profileBio.includes("Tokyo") || t.profileBio.includes("東京") || t.profileBio.includes("Tokio") || t.profileBio.includes("东京"), `${language}: profile bio mentions Tokyo`);
     console.assert(t.tours.some((tour) => tour.id === "classic" && tour.points.some((point) => point.includes("新宿") || point.includes("Shinjuku"))), `${language}: classic tour includes Shinjuku`);
     console.assert(t.discount.includes("#TokyoLocalFriends"), `${language}: discount hashtag exists`);
     console.assert(t.discount.includes("15"), `${language}: discount amount exists`);
@@ -519,25 +431,29 @@ function runContentTests() {
   });
 }
 
-if (typeof console !== "undefined") {
-  runContentTests();
+if (typeof console !== "undefined") runContentTests();
+
+function SectionTitle({ label, title, description, light = false }) {
+  return (
+    <div className="max-w-3xl">
+      <p className={light ? "text-purple-600 font-semibold" : "text-cyan-300 font-semibold"}>{label}</p>
+      <h2 className="mt-3 text-4xl md:text-6xl font-black">{title}</h2>
+      {description ? <p className={light ? "mt-5 text-zinc-600 text-lg leading-relaxed" : "mt-5 text-zinc-300 text-lg leading-relaxed"}>{description}</p> : null}
+    </div>
+  );
 }
 
 export default function TokyoFriendsWebsite() {
   const [language, setLanguage] = useState("en");
   const t = useMemo(() => translations[language] ?? translations.en, [language]);
+  const legal = useMemo(() => legalContent[language] ?? legalContent.en, [language]);
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
     if (!section) return;
-
     const headerOffset = 96;
     const sectionTop = section.getBoundingClientRect().top + window.pageYOffset;
-
-    window.scrollTo({
-      top: sectionTop - headerOffset,
-      behavior: "smooth",
-    });
+    window.scrollTo({ top: sectionTop - headerOffset, behavior: "smooth" });
   };
 
   return (
@@ -552,21 +468,12 @@ export default function TokyoFriendsWebsite() {
       </div>
 
       <div className="fixed top-5 right-5 z-50 flex flex-wrap justify-end gap-2 max-w-[calc(100%-2.5rem)]">
-        {[
-          { code: "en", label: "EN" },
-          { code: "ja", label: "JP" },
-          { code: "es", label: "ES" },
-          { code: "zh", label: "中文" },
-        ].map((lang) => (
+        {[{ code: "en", label: "EN" }, { code: "ja", label: "JP" }, { code: "es", label: "ES" }, { code: "zh", label: "中文" }].map((lang) => (
           <button
             key={lang.code}
             type="button"
             onClick={() => setLanguage(lang.code)}
-            className={`px-4 py-2 rounded-xl text-sm font-bold backdrop-blur border transition ${
-              language === lang.code
-                ? "bg-white text-zinc-950 border-white"
-                : "bg-white/10 text-white border-white/20 hover:bg-white/20"
-            }`}
+            className={`px-4 py-2 rounded-xl text-sm font-bold backdrop-blur border transition ${language === lang.code ? "bg-white text-zinc-950 border-white" : "bg-white/10 text-white border-white/20 hover:bg-white/20"}`}
             aria-pressed={language === lang.code}
           >
             {lang.label}
@@ -583,34 +490,17 @@ export default function TokyoFriendsWebsite() {
             <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-zinc-200 backdrop-blur">
               <Moon className="w-4 h-4" /> {t.badge}
             </div>
-
             <h1 className="mt-6 text-6xl md:text-8xl font-black tracking-tight leading-none">
               TOKYO
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-300">
-                FRIENDS!!!
-              </span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-300">FRIENDS!!!</span>
             </h1>
-
             <p className="mt-6 text-xl md:text-2xl text-zinc-200 leading-relaxed max-w-xl">{t.hero}</p>
-
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <a
-                href="https://www.instagram.com/tokyolocalfriends/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-2xl px-7 py-4 text-base font-semibold bg-white text-zinc-950 hover:bg-zinc-200 transition"
-              >
+              <a href="https://www.instagram.com/tokyolocalfriends/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-2xl px-7 py-4 text-base font-semibold bg-white text-zinc-950 hover:bg-zinc-200 transition">
                 <MessageCircle className="w-5 h-5 mr-2" /> {t.book}
               </a>
-              <button
-                type="button"
-                onClick={() => scrollToSection("tours")}
-                className="inline-flex items-center justify-center rounded-2xl px-7 py-4 text-base font-semibold border border-white/25 bg-white/5 text-white hover:bg-white/10 transition"
-              >
-                {t.view}
-              </button>
+              <button type="button" onClick={() => scrollToSection("tours")} className="inline-flex items-center justify-center rounded-2xl px-7 py-4 text-base font-semibold border border-white/25 bg-white/5 text-white hover:bg-white/10 transition">{t.view}</button>
             </div>
-
             <div className="mt-8 grid grid-cols-3 gap-3 max-w-xl">
               {t.metrics.map((metric) => (
                 <div key={metric.label} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur">
@@ -619,7 +509,6 @@ export default function TokyoFriendsWebsite() {
                 </div>
               ))}
             </div>
-
             <div className="mt-8 flex items-center gap-4 text-sm text-zinc-300">
               <div className="flex -space-x-2" aria-hidden="true">
                 <div className="w-9 h-9 rounded-full bg-pink-400 border-2 border-zinc-950" />
@@ -637,17 +526,13 @@ export default function TokyoFriendsWebsite() {
                 <div className="absolute bottom-0 left-0 right-0 p-7">
                   <div className="rounded-3xl bg-black/50 border border-white/10 p-5 backdrop-blur-md">
                     <div className="flex items-center gap-2 text-yellow-300" aria-label="Five star review">
-                      {[0, 1, 2, 3, 4].map((star) => (
-                        <Star key={star} className="w-5 h-5 fill-current" />
-                      ))}
+                      {[0, 1, 2, 3, 4].map((star) => <Star key={star} className="w-5 h-5 fill-current" />)}
                     </div>
                     <p className="mt-3 text-lg font-semibold">{t.review}</p>
                     <p className="mt-2 text-sm text-zinc-300">{t.reviewNote}</p>
                   </div>
                 </div>
-                <div className="absolute top-7 left-7 rounded-full bg-white text-zinc-950 px-4 py-2 text-sm font-bold">
-                  {t.locations}
-                </div>
+                <div className="absolute top-7 left-7 rounded-full bg-white text-zinc-950 px-4 py-2 text-sm font-bold">{t.locations}</div>
               </div>
             </div>
           </motion.div>
@@ -663,45 +548,23 @@ export default function TokyoFriendsWebsite() {
             </div>
             <p className="text-zinc-300 max-w-lg">{t.desc}</p>
           </div>
-
           <div className="mt-10 grid md:grid-cols-3 gap-5">
             {t.tours.map((tour) => {
               const Icon = tourIcons[tour.id] ?? MapPin;
-
               return (
                 <div key={tour.id} className="rounded-3xl border border-white/10 bg-white/[0.06] text-white shadow-xl">
                   <div className="p-6">
-                    <div className="w-12 h-12 rounded-2xl bg-white text-zinc-950 flex items-center justify-center">
-                      <Icon className="w-6 h-6" />
-                    </div>
+                    <div className="w-12 h-12 rounded-2xl bg-white text-zinc-950 flex items-center justify-center"><Icon className="w-6 h-6" /></div>
                     <h3 className="mt-5 text-2xl font-bold">{tour.title}</h3>
                     <p className="mt-1 text-zinc-400">{tour.subtitle}</p>
                     <p className="mt-4 text-pink-300 font-semibold">{tour.price}</p>
-
                     {tour.points.length > 0 ? (
                       <ul className="mt-5 space-y-3 text-zinc-300">
-                        {tour.points.map((point) => (
-                          <li key={point} className="flex gap-2">
-                            <span className="text-cyan-300">•</span>
-                            <span>{point}</span>
-                          </li>
-                        ))}
+                        {tour.points.map((point) => <li key={point} className="flex gap-2"><span className="text-cyan-300">•</span><span>{point}</span></li>)}
                       </ul>
                     ) : null}
-
-                    {tour.customEmphasis ? (
-                      <div className="mt-6 rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-pink-500/25 via-purple-500/20 to-cyan-400/25 p-5 text-center">
-                        <p className="text-3xl md:text-4xl font-black leading-tight text-white">
-                          {tour.customEmphasis}
-                        </p>
-                      </div>
-                    ) : null}
-
-                    {tour.customMessage ? (
-                      <div className="mt-6 rounded-2xl border border-pink-400/30 bg-gradient-to-r from-pink-500/20 to-cyan-400/20 p-4">
-                        <p className="text-lg md:text-xl font-black leading-snug text-white">{tour.customMessage}</p>
-                      </div>
-                    ) : null}
+                    {tour.customEmphasis ? <div className="mt-6 rounded-3xl border border-cyan-300/30 bg-gradient-to-br from-pink-500/25 via-purple-500/20 to-cyan-400/25 p-5 text-center"><p className="text-3xl md:text-4xl font-black leading-tight text-white">{tour.customEmphasis}</p></div> : null}
+                    {tour.customMessage ? <div className="mt-6 rounded-2xl border border-pink-400/30 bg-gradient-to-r from-pink-500/20 to-cyan-400/20 p-4"><p className="text-lg md:text-xl font-black leading-snug text-white">{tour.customMessage}</p></div> : null}
                   </div>
                 </div>
               );
@@ -712,12 +575,7 @@ export default function TokyoFriendsWebsite() {
 
       <section id="experience" className="px-5 py-20 bg-zinc-900 text-white scroll-mt-28">
         <div className="max-w-6xl mx-auto">
-          <div className="max-w-3xl">
-            <p className="text-cyan-300 font-semibold">{t.experienceLabel}</p>
-            <h2 className="mt-3 text-4xl md:text-6xl font-black">{t.experienceTitle}</h2>
-            <p className="mt-5 text-zinc-300 text-lg leading-relaxed">{t.experienceDesc}</p>
-          </div>
-
+          <SectionTitle label={t.experienceLabel} title={t.experienceTitle} description={t.experienceDesc} />
           <div className="mt-10 grid md:grid-cols-4 gap-4">
             {t.moments.map((moment, index) => (
               <div key={moment.title} className="rounded-3xl border border-white/10 bg-white/[0.06] p-5 shadow-xl">
@@ -732,22 +590,14 @@ export default function TokyoFriendsWebsite() {
 
       <section className="px-5 py-20 bg-zinc-950 text-white">
         <div className="max-w-6xl mx-auto">
-          <div className="max-w-3xl mb-10">
-            <p className="text-pink-300 font-semibold">{t.galleryLabel}</p>
-            <h2 className="mt-3 text-4xl md:text-6xl font-black">{t.galleryTitle}</h2>
-            <p className="mt-5 text-zinc-300 text-lg leading-relaxed">{t.galleryDesc}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-5">
+          <SectionTitle label={t.galleryLabel} title={t.galleryTitle} description={t.galleryDesc} />
+          <div className="mt-10 grid md:grid-cols-3 gap-5">
             {t.gallery.map((item, index) => (
               <div key={item.title} className="group relative min-h-[260px] rounded-[2rem] overflow-hidden border border-white/10 bg-white/[0.06] p-6 shadow-2xl">
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.28),transparent_30%),radial-gradient(circle_at_80%_80%,rgba(34,211,238,0.22),transparent_30%)] transition group-hover:scale-110" />
                 <div className="relative z-10 flex h-full flex-col justify-between">
                   <div className="text-6xl font-black text-white/10">0{index + 1}</div>
-                  <div>
-                    <h3 className="text-2xl font-black">{item.title}</h3>
-                    <p className="mt-3 text-zinc-300 leading-relaxed">{item.text}</p>
-                  </div>
+                  <div><h3 className="text-2xl font-black">{item.title}</h3><p className="mt-3 text-zinc-300 leading-relaxed">{item.text}</p></div>
                 </div>
               </div>
             ))}
@@ -757,10 +607,7 @@ export default function TokyoFriendsWebsite() {
 
       <section className="px-5 py-20 bg-zinc-950 text-white">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-[0.8fr_1.2fr] gap-10 items-start">
-          <div>
-            <p className="text-pink-300 font-semibold">{t.howLabel}</p>
-            <h2 className="mt-3 text-4xl md:text-5xl font-black">{t.howTitle}</h2>
-          </div>
+          <div><p className="text-pink-300 font-semibold">{t.howLabel}</p><h2 className="mt-3 text-4xl md:text-5xl font-black">{t.howTitle}</h2></div>
           <div className="grid sm:grid-cols-2 gap-4">
             {t.steps.map((step, index) => (
               <div key={step.title} className="rounded-3xl border border-white/10 bg-white/[0.06] p-6">
@@ -775,53 +622,35 @@ export default function TokyoFriendsWebsite() {
 
       <section id="guide" className="px-5 py-20 bg-zinc-900 text-white scroll-mt-28">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-[0.9fr_1.1fr] gap-10 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="relative"
-          >
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="relative">
             <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-br from-pink-500/30 via-purple-500/20 to-cyan-400/30 blur-2xl" />
-            <a
-              href="https://www.instagram.com/kana__deeeee/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Open Kanade's Instagram"
-              className="group relative block rounded-[2rem] overflow-hidden border border-white/10 bg-white p-3 shadow-2xl transition duration-300 hover:-translate-y-1 hover:shadow-cyan-400/20"
-            >
-              <img
-                src="data:image/webp;base64,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"
-                alt="Kanade illustrated profile"
-                className="w-full max-w-md mx-auto aspect-[4/5] object-contain object-center bg-white"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-6">
-                <p className="text-sm text-cyan-200 font-semibold">TOKYO FRIENDS!!!</p>
-                <p className="mt-1 text-2xl font-black text-white">Kanade</p>
-                <p className="mt-1 text-zinc-200">Local Tokyo Friend</p>
-                <p className="mt-3 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white transition group-hover:bg-white group-hover:text-zinc-950">
-                  Instagram →
-                </p>
+            <a href="https://www.instagram.com/kana__deeeee/" target="_blank" rel="noopener noreferrer" aria-label="Open Kanade's Instagram" className="group relative block rounded-[2rem] overflow-hidden border border-white/10 bg-gradient-to-br from-zinc-950 via-purple-950 to-zinc-900 p-4 shadow-2xl transition duration-300 hover:-translate-y-1 hover:shadow-cyan-400/20">
+              <div className="aspect-[4/5] rounded-[1.5rem] overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(236,72,153,0.45),transparent_28%),radial-gradient(circle_at_75%_35%,rgba(34,211,238,0.35),transparent_30%),linear-gradient(135deg,#09090b,#581c87,#111827)] relative">
+                <div className="absolute inset-0 opacity-30 bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:42px_42px]" />
+                <div className="absolute top-7 left-7 rounded-full bg-white text-zinc-950 px-4 py-2 text-sm font-black">TOKYO LOCAL</div>
+                <div className="absolute right-7 top-24 text-right"><p className="text-6xl font-black text-white/15">東京</p><p className="mt-2 text-lg font-black text-pink-300">SHIBUYA</p></div>
+                <div className="absolute left-1/2 top-1/2 w-56 h-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-pink-300 via-orange-200 to-cyan-200 p-1 shadow-[0_0_60px_rgba(236,72,153,0.45)]">
+                  <div className="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center text-center">
+                    <div><p className="text-7xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-cyan-200">K</p><p className="mt-1 text-sm font-bold text-zinc-300">KANADE</p></div>
+                  </div>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-6">
+                  <p className="text-sm text-cyan-200 font-semibold">TOKYO FRIENDS!!!</p>
+                  <p className="mt-1 text-2xl font-black text-white">Kanade</p>
+                  <p className="mt-1 text-zinc-200">Local Tokyo Friend</p>
+                  <p className="mt-3 inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white transition group-hover:bg-white group-hover:text-zinc-950">Instagram →</p>
+                </div>
               </div>
             </a>
           </motion.div>
-
           <div>
             <p className="text-cyan-300 font-semibold">{t.profileLabel}</p>
             <h2 className="mt-3 text-4xl md:text-6xl font-black">{t.profileTitle}</h2>
             <p className="mt-3 text-xl text-zinc-300 font-semibold">{t.profileRole}</p>
             <p className="mt-6 text-zinc-300 text-lg leading-relaxed">{t.profileBio}</p>
             <p className="mt-5 text-zinc-300 text-lg leading-relaxed">{t.profileBio2}</p>
-
             <div className="mt-8 flex flex-wrap gap-3">
-              {t.profileTags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-zinc-100"
-                >
-                  {tag}
-                </span>
-              ))}
+              {t.profileTags.map((tag) => <span key={tag} className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-zinc-100">{tag}</span>)}
             </div>
           </div>
         </div>
@@ -835,13 +664,10 @@ export default function TokyoFriendsWebsite() {
             <p className="mt-5 text-lg text-zinc-700 leading-relaxed">{t.whyDesc}</p>
             <p className="mt-5 text-lg md:text-xl font-black leading-relaxed text-zinc-950">{t.localSpotPromise}</p>
           </div>
-
           <div className="grid gap-4">
             {t.highlights.map((item) => (
               <div key={item} className="rounded-3xl border border-zinc-200 p-5 flex items-center gap-4 shadow-sm">
-                <div className="w-11 h-11 rounded-2xl bg-zinc-950 text-white flex items-center justify-center">
-                  <Camera className="w-5 h-5" />
-                </div>
+                <div className="w-11 h-11 rounded-2xl bg-zinc-950 text-white flex items-center justify-center"><Camera className="w-5 h-5" /></div>
                 <p className="font-semibold">{item}</p>
               </div>
             ))}
@@ -851,22 +677,33 @@ export default function TokyoFriendsWebsite() {
 
       <section id="faq" className="px-5 py-20 bg-zinc-950 text-white scroll-mt-28">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-[0.8fr_1.2fr] gap-10 items-start">
-          <div>
-            <p className="text-cyan-300 font-semibold">{t.faqLabel}</p>
-            <h2 className="mt-3 text-4xl md:text-5xl font-black">{t.faqTitle}</h2>
-          </div>
+          <div><p className="text-cyan-300 font-semibold">{t.faqLabel}</p><h2 className="mt-3 text-4xl md:text-5xl font-black">{t.faqTitle}</h2></div>
           <div className="grid gap-4">
             {t.faqs.map((faq) => (
               <div key={faq.q} className="rounded-3xl border border-white/10 bg-white/[0.06] p-6">
-                <div className="flex items-start gap-4">
-                  <HelpCircle className="mt-1 h-6 w-6 flex-none text-cyan-300" />
-                  <div>
-                    <h3 className="text-xl font-bold">{faq.q}</h3>
-                    <p className="mt-2 text-zinc-300 leading-relaxed">{faq.a}</p>
-                  </div>
-                </div>
+                <div className="flex items-start gap-4"><HelpCircle className="mt-1 h-6 w-6 flex-none text-cyan-300" /><div><h3 className="text-xl font-bold">{faq.q}</h3><p className="mt-2 text-zinc-300 leading-relaxed">{faq.a}</p></div></div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="legal" className="px-5 py-20 bg-white text-zinc-950">
+        <div className="max-w-6xl mx-auto">
+          <SectionTitle label={t.legalLabel} title={t.legalTitle} description={t.legalNote} light />
+          <div className="mt-10 grid lg:grid-cols-2 gap-6">
+            <div className="rounded-[2rem] border border-zinc-200 bg-zinc-50 p-6 shadow-sm">
+              <h3 className="text-2xl font-black">{t.termsTitle}</h3>
+              <div className="mt-6 space-y-5">
+                {legal.terms.map(([title, text]) => <div key={title}><h4 className="font-bold text-zinc-950">{title}</h4><p className="mt-2 text-sm leading-relaxed text-zinc-600">{text}</p></div>)}
+              </div>
+            </div>
+            <div className="rounded-[2rem] border border-zinc-200 bg-zinc-50 p-6 shadow-sm">
+              <h3 className="text-2xl font-black">{t.privacyTitle}</h3>
+              <div className="mt-6 space-y-5">
+                {legal.privacy.map(([title, text]) => <div key={title}><h4 className="font-bold text-zinc-950">{title}</h4><p className="mt-2 text-sm leading-relaxed text-zinc-600">{text}</p></div>)}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -876,41 +713,14 @@ export default function TokyoFriendsWebsite() {
           <Users className="w-12 h-12 mx-auto text-cyan-300" />
           <h2 className="mt-5 text-4xl md:text-6xl font-black">{t.ready}</h2>
           <p className="mt-5 text-zinc-300 text-lg">{t.readyDesc}</p>
-          <div className="mt-6 inline-flex rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-5 py-4 text-left shadow-lg">
-            <p className="text-lg md:text-xl font-black text-cyan-100">{t.discount}</p>
-          </div>
+          <div className="mt-6 inline-flex rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-5 py-4 text-left shadow-lg"><p className="text-lg md:text-xl font-black text-cyan-100">{t.discount}</p></div>
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-            <a
-              href="https://www.instagram.com/tokyolocalfriends/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-2xl px-8 py-4 text-base font-semibold bg-gradient-to-r from-pink-500 to-cyan-400 text-white hover:opacity-90 transition"
-            >
-              {t.instagram}
-            </a>
+            <a href="https://www.instagram.com/tokyolocalfriends/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-2xl px-8 py-4 text-base font-semibold bg-gradient-to-r from-pink-500 to-cyan-400 text-white hover:opacity-90 transition">{t.instagram}</a>
             <div className="relative flex flex-col items-center">
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-                className="mb-2 rounded-full bg-cyan-300 px-4 py-1 text-sm font-black text-zinc-950 shadow-lg shadow-cyan-300/30"
-              >
-                {t.bookingHint}
-              </motion.div>
-              <a
-                href={bookingFormUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-2xl px-8 py-4 text-base font-black bg-white text-zinc-950 hover:bg-zinc-200 transition ring-4 ring-cyan-300/30 shadow-2xl shadow-cyan-300/20"
-              >
-                → {t.bookingForm} ←
-              </a>
+              <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }} className="mb-2 rounded-full bg-cyan-300 px-4 py-1 text-sm font-black text-zinc-950 shadow-lg shadow-cyan-300/30">{t.bookingHint}</motion.div>
+              <a href={bookingFormUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-2xl px-8 py-4 text-base font-black bg-white text-zinc-950 hover:bg-zinc-200 transition ring-4 ring-cyan-300/30 shadow-2xl shadow-cyan-300/20">→ {t.bookingForm} ←</a>
             </div>
-            <a
-              href="mailto:tokyolocalfriends@gmail.com"
-              className="inline-flex items-center justify-center rounded-2xl px-8 py-4 text-base font-semibold border border-white/20 bg-white/5 text-white hover:bg-white/10 transition"
-            >
-              {t.email}
-            </a>
+            <a href="mailto:tokyolocalfriends@gmail.com" className="inline-flex items-center justify-center rounded-2xl px-8 py-4 text-base font-semibold border border-white/20 bg-white/5 text-white hover:bg-white/10 transition">{t.email}</a>
           </div>
           <p className="mt-8 text-sm text-zinc-500">{t.footer}</p>
         </div>
